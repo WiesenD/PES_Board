@@ -6,6 +6,7 @@
 // drivers
 #include "DebounceIn.h"
 
+// Globale Variablen
 bool do_execute_main_task = false; // this variable will be toggled via the user button (blue button) and
                                    // decides whether to execute the main task or not
 bool do_reset_all_once = false;    // this variable is used to reset certain variables and objects and
@@ -15,6 +16,7 @@ bool do_reset_all_once = false;    // this variable is used to reset certain var
 DebounceIn user_button(BUTTON1);   // create DebounceIn to evaluate the user button
 void toggle_do_execute_main_fcn(); // custom function which is getting executed when user
                                    // button gets pressed, definition below
+float ir_sensor_compensation(float ir_distance_mV);
 
 // main runs as an own thread
 int main()
@@ -24,7 +26,7 @@ int main()
 
     // while loop gets executed every main_task_period_ms milliseconds, this is a
     // simple approach to repeatedly execute main
-    const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, there for
+    const int main_task_period_ms = 200; // define main task period time in ms e.g. 20 ms, there for
                                         // the main task will run 50 times per second
     Timer main_task_timer;              // create Timer object which we use to run the main task
                                         // every main_task_period_ms
@@ -36,6 +38,13 @@ int main()
     // create DigitalOut object to command extra led, you need to add an aditional resistor, e.g. 220...500 Ohm
     // a led has an anode (+) and a cathode (-), the cathode needs to be connected to ground via the resistor
     DigitalOut led1(PB_9);
+    // IR Sensor
+    float ir_distance_mV = 0.0f;
+    float ir_distance_cm = 0.0f;
+
+    AnalogIn ir_analog_in(PC_2);
+
+    printf("IR distance mV: %f \n", ir_distance_mV);
 
     // start timer
     main_task_timer.start();
@@ -46,8 +55,13 @@ int main()
 
         if (do_execute_main_task) {
 
+            ir_distance_mV = 1.0e3f * ir_analog_in.read() * 3.3f;
+            ir_distance_cm = ir_sensor_compensation(ir_distance_mV);
             // visual feedback that the main task is executed, setting this once would actually be enough
             led1 = 1;
+            printf("IR distance mV: %f \n", ir_distance_mV);
+            // print to the serial terminal
+            printf("IR distance mV: %f IR distance cm: %f \n", ir_distance_mV, ir_distance_cm);
         } else {
             // the following code block gets executed only once
             if (do_reset_all_once) {
@@ -55,8 +69,11 @@ int main()
 
                 // reset variables and objects
                 led1 = 0;
+                ir_distance_mV = 0.0f;
             }
         }
+
+
 
         // toggling the user led
         user_led = !user_led;
@@ -77,4 +94,17 @@ void toggle_do_execute_main_fcn()
     // set do_reset_all_once to true if do_execute_main_task changed from false to true
     if (do_execute_main_task)
         do_reset_all_once = true;
+}
+
+float ir_sensor_compensation(float ir_distance_mV)
+{
+    // insert values that you got from the MATLAB file
+    static const float a = 10295.9871f;
+    static const float b = -196.3374f;
+
+    // avoid division by zero by adding a small value to the denominator
+    if (ir_distance_mV + b == 0.0f)
+        ir_distance_mV -= 0.001f;
+
+    return a / (ir_distance_mV + b);
 }
