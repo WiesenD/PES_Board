@@ -23,15 +23,14 @@
  *
  * Example:
  * ```
- * DCMotor motor(PIN_PWM, PIN_ENC_A, PIN_ENC_B, COUNTS_PER_TURN, KN, VOLTAGE_MAX);
+ * DCMotor motor(PWM_PIN, ENC_A_PIN, ENC_B_PIN, COUNTS_PER_TURN, KN, VOLTAGE_MAX);
  * motor.setVelocity(1.5f); // command velocity to 1.5 rotations per second
  * float currentVelocity = motor.getVelocity(); // read current velocity
  * motor.setRotation(5.0f); // command rotation to 5
  * motor.getRotation(); // read current rotation
  * ```
  *
- * @author M. E. Peter
- * @date 11.12.2023
+ * @author M. Peter / pmic / pichim
  */
 
 #ifndef DC_MOTOR_H_
@@ -70,17 +69,17 @@ public:
     /**
      * @brief Construct a new DCMotor object.
      *
-     * @param pin_pwm The pin name for PWM control of the motor.
-     * @param pin_enc_a The first pin name for the encoder.
-     * @param pin_enc_b The second pin name for the encoder.
+     * @param pwm_pin The pin name for PWM control of the motor.
+     * @param enc_a_pin The first pin name for the encoder.
+     * @param enc_b_pin The second pin name for the encoder.
      * @param gear_ratio The gear ratio of the gear box.
-     * @param kn The motor constant.
-     * @param voltage_max The maximum voltage for the motor.
-     * @param counts_per_turn The number of encoder counts per turn of the motor.
+     * @param kn The motor constant [rpm/V].
+     * @param voltage_max The maximum voltage for the motor (default: 12.0f).
+     * @param counts_per_turn The number of encoder counts per turn of the motor (default: 20.0f).
      */
-    explicit DCMotor(PinName pin_pwm,
-                     PinName pin_enc_a,
-                     PinName pin_enc_b,
+    explicit DCMotor(PinName pwm_pin,
+                     PinName enc_a_pin,
+                     PinName enc_b_pin,
                      float gear_ratio,
                      float kn,
                      float voltage_max = 12.0f,
@@ -89,7 +88,7 @@ public:
     /**
      * @brief Destroy the DCMotor object.
      */
-    ~DCMotor();
+    virtual ~DCMotor();
 
     /**
      * @brief Set the target velocity of the motor.
@@ -256,6 +255,13 @@ public:
      * @param position The position in rotations.
      */
     void setMotionPlanerPosition(float position = 0.0f);
+
+    /**
+     * @brief Set the PWM period in microseconds.
+     *
+     * @param period_mus The Period in microseconds. Make sure period_mus <= PERIOD_MUS (see below).
+     */
+    void setFastPWMPeriod_mus(int period_mus);
 
 #if PERFORM_GPA_MEAS
     void startGPA();

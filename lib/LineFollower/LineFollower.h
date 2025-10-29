@@ -1,3 +1,9 @@
+/**
+ * @file LineFollower.h
+ * @brief This file defines the LineFollower class.
+ * @author M. Peter / pmic / pichim
+ */
+
 #ifndef LINE_FOLLOWER_H_
 #define LINE_FOLLOWER_H_
 
@@ -36,7 +42,7 @@ public:
     /**
      * @brief Destroy the Line Follower object.
      */
-    ~LineFollower();
+    virtual ~LineFollower();
 
     /**
      * @brief Set the gains for the rotational velocity controller.
@@ -44,14 +50,14 @@ public:
      * @param Kp Proportional gain.
      * @param Kp_nl Non-linear proportional gain.
      */
-    void setRotationalVelocityGain(float Kp = 2.0f, float Kp_nl = 17.0f);
+    void setRotationalVelocityControllerGains(float Kp = 2.0f, float Kp_nl = 17.0f);
 
     /**
      * @brief Set the maximum wheel velocity.
      *
      * @param wheel_vel_max Maximum wheel velocity.
      */
-    void setMaxWheelVelocityRPS(float wheel_vel_max);
+    void setMaxWheelVelocity(float wheel_vel_max);
 
     /**
      * @brief Get the angle in radians.

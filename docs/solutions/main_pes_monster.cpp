@@ -8,6 +8,7 @@
 #include "DebounceIn.h"
 #include "IMU.h"
 #include "IRSensor.h"
+#include "RealTimeThread.h"
 #include "SDLogger.h"
 #include "Servo.h"
 #include "UltrasonicSensor.h"
@@ -44,7 +45,7 @@ bool do_reset_all_once = false;    // this variable is used to reset certain var
 // objects for user button (blue button) handling on nucleo board
 DebounceIn user_button(BUTTON1);   // create DebounceIn to evaluate the user button
 void toggle_do_execute_main_fcn(); // custom function which is getting executed when user
-                                   // button gets pressed, definition below
+                                   // button gets pressed, definition at the end
 
 // main runs as an own thread
 int main()
@@ -62,7 +63,7 @@ int main()
 
     // while loop gets executed every main_task_period_ms milliseconds, this is a
     // simple approach to repeatedly execute main
-    const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, there for
+    const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, therefore
                                         // the main task will run 50 times per second
     Timer main_task_timer;              // create Timer object which we use to run the main task
                                         // every main_task_period_ms
@@ -71,9 +72,11 @@ int main()
     DigitalOut user_led(LED1);
 
     // additional led
-    // create DigitalOut object to command extra led, you need to add an aditional resistor, e.g. 220...500 Ohm
+    // create DigitalOut object to command extra led, you need to add an additional resistor, e.g. 220...500 Ohm
     // a led has an anode (+) and a cathode (-), the cathode needs to be connected to ground via the resistor
     DigitalOut led1(PB_9);
+
+    // --- adding variables and objects and applying functions starts here ---
     DigitalOut led2(PB_8);
 
     // mechanical button
@@ -86,6 +89,27 @@ int main()
     float ir_distance_avg = 0.0f;
     IRSensor ir_sensor(PC_2);                      // before the calibration the read function will return the averaged mV value
     ir_sensor.setCalibration(2.574e+04f, -29.37f); // after the calibration the read function will return the calibrated value
+
+    // real time thread template
+    RealTimeThread real_time_thread(1000000);
+
+    class MyRealTimeThread : public RealTimeThread {
+        // for every constructor that exists in RealTimeThread, add a corresponding constructor to the 
+        // overload set of MyRealTimeThread that simply forwards its arguments to the base‐class constructor
+        using RealTimeThread::RealTimeThread;
+    protected:
+        void executeTask() override {
+            static uint32_t run_cntr = 0;
+            // avoid printf in real-time threads by default, this is just an example!
+            printf("MyRealTimeThread is enabled and runs for the %lu time\n", run_cntr++);
+        }
+    };
+    MyRealTimeThread my_real_time_thread(2000000);
+
+    // TODO RealTimeThread:
+    // - check diagnostics of the real-time thread, e.g. execution time, max. execution time, etc.
+    // - alter it so that i can use inheritance and also use relevant objects for mahony, dc motor control and line follower
+    // - ... many things ...
 
     // servo
     Servo servo_D0(PB_D0);
@@ -122,7 +146,7 @@ int main()
     DigitalOut enable_motors(PB_ENABLE_DCMOTORS);
 
     const float voltage_max = 12.0f; // maximum voltage of battery packs, adjust this to
-                                        // 6.0f V if you only use one battery pack
+                                     // 6.0f V if you only use one battery pack
 
     // https://www.pololu.com/product/3475/specs
     const float gear_ratio_M1 = 31.25f; // gear ratio
@@ -160,6 +184,12 @@ int main()
     // const float velocity_max_M3 = kn_M3 / 60.0f * voltage_max; // maximum velocity in rotations per second
     // motor_M3.setMaxVelocity(velocity_max_M3 * 0.5f);           // set maximum velocity to 50% of maximum velocity
 
+    // // adjust fast pwm frequency
+    // int period_mus = 2000; // 500 Hz
+    // motor_M1.setFastPWMPeriod_mus(period_mus);
+    // motor_M2.setFastPWMPeriod_mus(period_mus);
+    // motor_M3.setFastPWMPeriod_mus(period_mus);
+
     const float motor_setpoint_M1 = 300.0f / gear_ratio_M1;
     const float motor_setpoint_M2 = 300.0f / gear_ratio_M2;
     const float motor_setpoint_M3 = 300.0f / gear_ratio_M3;
@@ -182,13 +212,21 @@ int main()
     while (true) {
         main_task_timer.reset();
 
+        // --- code that runs every cycle at the start goes here ---
+
         if (do_execute_main_task) {
+
+        // --- code that runs when the blue button was pressed goes here ---
 
             // visual feedback that the main task is executed, setting this once would actually be enough
             led1 = 1;
 
             // read analog input
             ir_distance_avg = ir_sensor.read();
+
+            // enable real time threads
+            real_time_thread.enable();
+            my_real_time_thread.enable();
 
             // read us sensor distance, only valid measurements will update us_distance_cm
             const float us_distance_cm_candidate = us_sensor.read();
@@ -281,9 +319,13 @@ int main()
             if (do_reset_all_once) {
                 do_reset_all_once = false;
 
+                // --- variables and objects that should be reset go here ---
+
                 // reset variables and objects
                 led1 = led2 = 0;
                 ir_distance_avg = 0.0f;
+                real_time_thread.disable();
+                my_real_time_thread.disable();
                 us_distance_cm = 0.0f;
                 imu_data.init();
                 servo_D0.setPulseWidth(0.0f);
@@ -298,6 +340,8 @@ int main()
 
         // toggling the user led
         user_led = !user_led;
+
+        // --- code that runs every cycle at the end goes here ---
 
         // print to the serial terminal
         printf("IR cm: %6.2f, US cm: %6.2f, R deg: %6.2f, P deg: %6.2f, Y deg: %6.2f, M1 rot: %6.2f, %6.2f, M2 rot: %6.2f, %6.2f, M3 rot: %6.2f, %6.2f \n",

@@ -1,3 +1,9 @@
+/**
+ * @file Chirp.h
+ * @brief This file defines the Chirp Signal Generator class.
+ * @author M. Peter / pmic / pichim
+ */
+
 #ifndef CHIRP_H_
 #define CHIRP_H_
 
@@ -11,9 +17,9 @@
 class Chirp
 {
 public:
-    Chirp() {};
-    Chirp(const float f0, const float f1, const float t1, const float Ts);
-    ~Chirp() = default;
+    explicit Chirp() {};
+    explicit Chirp(const float f0, const float f1, const float t1, const float Ts);
+    virtual ~Chirp() = default;
 
     void init(const float f0, const float f1, const float t1, const float Ts);
     void reset();

@@ -34,7 +34,7 @@ bool do_reset_all_once = false;    // this variable is used to reset certain var
 // objects for user button (blue button) handling on nucleo board
 DebounceIn user_button(BUTTON1);   // create DebounceIn to evaluate the user button
 void toggle_do_execute_main_fcn(); // custom function which is getting executed when user
-                                   // button gets pressed, definition below
+                                   // button gets pressed, definition at the end
 
 // main runs as an own thread
 int main()
@@ -44,13 +44,15 @@ int main()
 
     // while loop gets executed every main_task_period_ms milliseconds, this is a
     // simple approach to repeatedly execute main
-    const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, there for
+    const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, therefore
                                         // the main task will run 50 times per second
     Timer main_task_timer;              // create Timer object which we use to run the main task
                                         // every main_task_period_ms
 
     // led on nucleo board
     DigitalOut user_led(LED1);
+
+    // --- adding variables and objects and applying functions starts here ---
 
     // stepper motors
     Stepper stepper_M1(PB_9, PB_8);
@@ -63,7 +65,11 @@ int main()
     while (true) {
         main_task_timer.reset();
 
+        // --- code that runs every cycle at the start goes here ---
+
         if (do_execute_main_task) {
+
+        // --- code that runs when the blue button was pressed goes here ---
 
             // set velocity in rps
             // stepper_M1.setVelocity(0.1f);
@@ -77,6 +83,8 @@ int main()
             // the following code block gets executed only once
             if (do_reset_all_once) {
                 do_reset_all_once = false;
+
+                // --- variables and objects that should be reset go here ---
                 
                 // set rotation relative to current position
                 stepper_M1.setRotationRelative(-1.0f, 1.0f);
@@ -89,6 +97,8 @@ int main()
 
         // toggling the user led
         user_led = !user_led;
+
+        // --- code that runs every cycle at the end goes here ---
 
         // read timer and make the main thread sleep for the remaining time span (non blocking)
         int main_task_elapsed_time_ms = duration_cast<milliseconds>(main_task_timer.elapsed_time()).count();

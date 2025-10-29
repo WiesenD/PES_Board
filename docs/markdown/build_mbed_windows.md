@@ -1,4 +1,4 @@
-# Build Mbed OS Projects Windows with VSCode
+# Build Mbed OS Projects on Windows with VS Code
 
 Tested on Windows 11. Last tested on 28.01.2024.
 
@@ -12,13 +12,13 @@ Just answer all prompts with `yes` and/or `Enter`.
 
 ### Update Conda
 
-```
+```bash
 conda update --all
 ```
 
 ### Disable Conda's auto-activation (optional)
 
-```
+```bash
 conda config --set auto_activate_base false
 ```
 
@@ -28,13 +28,13 @@ To replicate the Conda environment, use the file `docs/conda_envs/mbed-env-windo
 
 You can create the environment with the following command
 
-```
+```bash
 conda env create -f mbed-env-linux.yml
 ```
 
 ## GCC ARM Embedded Toolchain
 
-### Download the the latest Version of the Toolchain
+### Download the Latest Version of the Toolchain
 
 Download and install the latest installer from https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads. Make sure you select the version of the `GNU Arm Embedded Toolchain` for your operating system, e.g. `arm-gnu-toolchain-13.3.rel1-mingw-w64-i686-arm-none-eabi.exe` for Windows.
 
@@ -50,14 +50,14 @@ Simply execute the installer and follow the instructions, use the default settin
 
 Download the latest installer from https://nodejs.org/en/download or get the file `node-v22.13.1-x64.msi` from the ZHAW server `\\shared.zhaw.ch\public\staff\pmic\out\Mbed\Windows`.
 
-Install Node.js, use the default settings. To veryfy the installation, open a terminal and type
+Install Node.js, use the default settings. To verify the installation, open a terminal and type
 
 ```bash
 node -v
 npm -v
 ```
 
-Within the opened terminal install the Mbed VSCode Generator with the following command
+Within the opened terminal install the Mbed VS Code Generator with the following command
 
 ```bash
 npm install -g mbed-vscode-generator
@@ -67,11 +67,11 @@ npm install -g mbed-vscode-generator
 
 Replace `pichim` with your GitHub username so that you clone your fork of the repository (if you intend to use version control).
 
-```
+```bash
 git clone https://github.com/pichim/PES_Board.git
 ```
 
-## Recommended Extensions in VSCode (might not all be necessary)
+## Recommended Extensions in VS Code (might not all be necessary)
 
 - `C/C++ Extension Pack` by Microsoft
 - `Python` by Microsoft
@@ -82,24 +82,24 @@ git clone https://github.com/pichim/PES_Board.git
 - `CMake Tools` by Microsoft
 - `Makefile Tools` by Microsoft
 
-## Activate the Conda environment in VSCode
+## Activate the Conda environment in VS Code
 
-You have to open the folder of the Mbed project in VSCode.
+You have to open the folder of the Mbed project in VS Code.
 
-Press Cntrl+Shift+P and type `Python: Select Interpreter` and select the `mbed-env` environment.
+Press Ctrl+Shift+P and type `Python: Select Interpreter` and select the `mbed-env` environment.
 
 ## Set up the Mbed Tools
 
 Make sure you have a file '.mbed' in the root of your project with the following content
 
-```
+```bash
 ROOT=.
 
 ```
 
-Use the terminal in VSCode for the following commands.
+Use the terminal in VS Code for the following commands.
 
-```
+```bash
 mbed toolchain GCC_ARM
 mbed config GCC_ARM_PATH "C:\Program Files (x86)\Arm GNU Toolchain arm-none-eabi\13.3 rel1\bin"
 mbed-vscode-generator -m NUCLEO_F446RE
@@ -107,7 +107,7 @@ mbed-vscode-generator -m NUCLEO_F446RE
 
 The following command only works if you use Windows PowerShell. Replace the `gcc-x64` with `gcc-arm` in the `.vscode/c_cpp_properties.json` and `--profile=debug` with `--profile=develop` in the `.vscode/tasks.json` files
 
-```
+```bash
 (Get-Content .vscode/c_cpp_properties.json) -replace '"gcc-x64"', '"gcc-arm"' | Set-Content .vscode/c_cpp_properties.json
 (Get-Content .vscode/tasks.json) -replace '--profile=debug', '--profile=develop' | Set-Content .vscode/tasks.json
 ```
@@ -116,13 +116,13 @@ The following command only works if you use Windows PowerShell. Replace the `gcc
 
 If you only use VSCode, you can install Mbed OS using git with the following command
 
-```
+```bash
 git clone --branch mbed-os-6.17.0 --depth 1 https://github.com/ARMmbed/mbed-os.git
 ```
 
 ## Build the project
 
-Press Cntrl+Shift+B and select `Build Mbed OS application`.
+Press Ctrl+Shift+B and select `Build Mbed OS application`.
 
 The binary file will be in the `BUILD\NUCLEO_F446RE\GCC_ARM-DEVELOP\PES_Board.bin` directory.
 
@@ -130,13 +130,13 @@ The binary file will be in the `BUILD\NUCLEO_F446RE\GCC_ARM-DEVELOP\PES_Board.bi
 
 You can flash the binary file to the board using the USB cable. Just drag and drop the binary file to the board when connected.
 
-## Serial Monitor in VSCode
+## Serial Monitor in VS Code
 
 You can use the extension
 
 - `Serial Monitor` by Microsoft
 
-to monitor the serial output of the board in VSCode directly.
+to monitor the serial output of the board in VS Code directly.
 
 <!-- ## Using a Symbolic Link to `mbed-os` to save Space
 
@@ -148,7 +148,7 @@ To make this work you have to run PowerShell as Administrator in navigate to the
 
 Command to Create the Symbolic Link
 
-```
+```bash
 New-Item -ItemType SymbolicLink `
     -Path ".\mbed-os" `
     -Value "..\mbed-os"

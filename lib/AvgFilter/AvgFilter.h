@@ -1,3 +1,9 @@
+/**
+ * @file AvgFilter.h
+ * @brief This file defines the Average Filter class.
+ * @author M. Peter / pmic / pichim
+ */
+
 #ifndef AVG_FILTER_H_
 #define AVG_FILTER_H_
 
@@ -10,13 +16,13 @@ class AvgFilter
 {
 public:
     // default constructor (does nothing by itself)
-    AvgFilter(){};
+    explicit AvgFilter() {};
 
     // constructor that initializes the filter with N samples
-    AvgFilter(uint8_t N);
+    explicit AvgFilter(uint8_t N);
 
     // destructor
-    ~AvgFilter();
+    virtual ~AvgFilter();
 
     // initializes/allocates the ring buffer for N samples
     void init(uint8_t N);

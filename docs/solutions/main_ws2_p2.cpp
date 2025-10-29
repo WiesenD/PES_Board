@@ -16,7 +16,7 @@ bool do_reset_all_once = false;    // this variable is used to reset certain var
 // objects for user button (blue button) handling on nucleo board
 DebounceIn user_button(BUTTON1);   // create DebounceIn to evaluate the user button
 void toggle_do_execute_main_fcn(); // custom function which is getting executed when user
-                                   // button gets pressed, definition below
+                                   // button gets pressed, definition at the end
 
 // main runs as an own thread
 int main()
@@ -34,7 +34,7 @@ int main()
 
     // while loop gets executed every main_task_period_ms milliseconds, this is a
     // simple approach to repeatedly execute main
-    const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, there for
+    const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, therefore
                                         // the main task will run 50 times per second
     Timer main_task_timer;              // create Timer object which we use to run the main task
                                         // every main_task_period_ms
@@ -43,9 +43,11 @@ int main()
     DigitalOut user_led(LED1);
 
     // additional led
-    // create DigitalOut object to command extra led, you need to add an aditional resistor, e.g. 220...500 Ohm
+    // create DigitalOut object to command extra led, you need to add an additional resistor, e.g. 220...500 Ohm
     // a led has an anode (+) and a cathode (-), the cathode needs to be connected to ground via the resistor
     DigitalOut led1(PB_9);
+
+    // --- adding variables and objects and applying functions starts here ---
 
     // mechanical button
     DigitalIn mechanical_button(PC_5); // create DigitalIn object to evaluate mechanical button, you
@@ -89,7 +91,11 @@ int main()
     while (true) {
         main_task_timer.reset();
 
+        // --- code that runs every cycle at the start goes here ---
+
         if (do_execute_main_task) {
+
+        // --- code that runs when the blue button was pressed goes here ---
 
             // visual feedback that the main task is executed, setting this once would actually be enough
             led1 = 1;
@@ -114,7 +120,7 @@ int main()
                     printf("EXECUTION\n");
                     // function to map the distance to the servo movement (us_distance_min, us_distance_max) -> (0.0f, 1.0f)
                     servo_input = (us_distance_cm - us_distance_min) / (us_distance_max - us_distance_min);
-                    // values smaller than 0.0f or bigger than 1.0f ar constrained to the range (0.0f, 1.0f) in setPulseWidth
+                    // values smaller than 0.0f or bigger than 1.0f are constrained to the range (0.0f, 1.0f) in setPulseWidth
                     servo_D0.setPulseWidth(servo_input);
 
                     // if the measurement is outside the min or max limit go to SLEEP
@@ -157,6 +163,8 @@ int main()
             if (do_reset_all_once) {
                 do_reset_all_once = false;
 
+                // --- variables and objects that should be reset go here ---
+
                 // reset variables and objects
                 led1 = 0;
                 servo_D0.disable();
@@ -167,6 +175,8 @@ int main()
 
         // toggling the user led
         user_led = !user_led;
+
+        // --- code that runs every cycle at the end goes here ---
 
         // print to the serial terminal
         printf("US distance cm: %f \n", us_distance_cm);

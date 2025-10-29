@@ -28,15 +28,15 @@ Below are the specifications of two tested stepper motors as well as the externa
 | Resistance           | 2.7 Ohm  | 1.65 Ohm   |
 | Number of leads      | 4        | 4          |
 
-| Parameter                   | A4988 Stepper Motor Driver Carrier |
-| --------------------------- | ---------------------------------- |
-| Minimum operating voltage   | 8 V                                |
-| Maximum operating voltage   | 35 V                               |
-| Continous current per phase | 1 A                                |
-| Maximum current per phase   | 2 A                                |
-| Minimum logic voltage       | 3 V                                |
-| Maximum logic voltage       | 5.5 V                              |
-| Microstep resolutions       | full, 1/2, 1/4, 1/8, 1/16          |
+| Parameter                    | A4988 Stepper Motor Driver Carrier |
+| ---------------------------- | ---------------------------------- |
+| Minimum operating voltage    | 8 V                                |
+| Maximum operating voltage    | 35 V                               |
+| Continuous current per phase | 1 A                                |
+| Maximum current per phase    | 2 A                                |
+| Minimum logic voltage        | 3 V                                |
+| Maximum logic voltage        | 5.5 V                              |
+| Microstep resolutions        | full, 1/2, 1/4, 1/8, 1/16          |
 
 ## Links
 
@@ -64,9 +64,9 @@ For more information check out [A4988 Stepper Motor Driver Carrier][3] and the v
 
 ## Stepper Motor Example
 
-The `Stepper` class driver controls a stepper motor. The hardware works with specific step and direction pins and step-per-revolution settings. The class provides methods to retrieve the current step count, rotation, and velocity of the motor. It also includes methods to set the motor's velocity, absolute and relative rotation, and the number of steps. Additionally, the driver manages motor stepping, threading, and timing through its internal methods and variables.
+The `Stepper` class driver controls a stepper motor. The hardware works with specific step and direction pins and steps-per-revolution settings. The class provides methods to retrieve the current step count, rotation, and velocity of the motor. It also includes methods to set the motor's velocity, absolute and relative rotation, and the number of steps. Additionally, the driver manages motor stepping, threading, and timing through its internal methods and variables.
 
-To start working with the motors, it is necessary to wire it correclty and create an object in the ***main.cpp*** file and assign proper pins, in the following example there will be two motors in use.
+To start working with the motors, it is necessary to wire them correctly and create an object in the ***main.cpp*** file and assign proper pins. In the following example, there will be two motors in use.
 
 ### Connection to the Nucleo Board
 
@@ -77,30 +77,31 @@ The motors are directly connected to the hardware driver according to the diagra
     <i>Pololu driver connections</i>
 </p>
 
-A detailed sketch of the wireing can be found in the file, which can be found in the file [stepper_motor_connection.pdf](../dev/dev_steppermotor/stepper_motor_connection.pdf) <br>
+A detailed sketch of the wiring can be found in the file [stepper_motor_connection.pdf](../dev/dev_steppermotor/stepper_motor_connection.pdf)
 
 **Motor 1 Pins**
 
-```
+```cpp
 Step PB_9
 Direction PB_8
 ```
+
 **Motor 2 Pins**
 
-```
+```cpp
 Step PB_4
 Direction PA_7
 ```
 
 ### Create Stepper Object
 
-Initially, it's essential to add the suitable drivers to the ***main.cpp*** file and then create a ``Stepper`` object inside ``main()`` function with the pin names passed as an argument.
+Initially, it's essential to add the suitable drivers to the ***main.cpp*** file and then create a ``Stepper`` object inside the ``main()`` function with the pin names passed as an argument.
 
-```
+```cpp
 #include "Stepper.h"
 ```
 
-```
+```cpp
 // stepper motors
 Stepper stepper_M1(PB_9, PB_8);
 Stepper stepper_M2(PB_4, PA_7);
@@ -115,7 +116,7 @@ The driver is designed to work with stepper motors that require direction and st
 1. **Setting Rotation (`setRotation`)**:
    - **Purpose**: Moves the motor to a specified rotation count. You can set the rotation with or without specifying the velocity.
    - **Usage**:
-     ```
+     ```cpp
      myStepper.setRotation(2.0);      // moves to 2 full rotations at default velocity
      myStepper.setRotation(3.5, 2.0); // moves to 3.5 rotations at 2 rotations per second
      ```
@@ -123,7 +124,7 @@ The driver is designed to work with stepper motors that require direction and st
 2. **Relative Rotation (`setRotationRelative`)**:
    - **Purpose**: Rotates the motor by a specified relative amount from its current position. Like `setRotation`, you can specify velocity or use the current velocity.
    - **Usage**:
-     ```
+     ```cpp
      myStepper.setRotationRelative(1.0);       // moves 1 full rotation forward from the current position
      myStepper.setRotationRelative(-0.5, 1.5); // moves 0.5 rotations backward at 1.5 rotations per second
      ```
@@ -131,7 +132,7 @@ The driver is designed to work with stepper motors that require direction and st
 3. **Setting Velocity (`setVelocity`)**:
    - **Purpose**: Sets the motor's velocity directly, either moving it at a constant speed or stopping it if the velocity is zero.
    - **Usage**:
-     ```
+     ```cpp
      myStepper.setVelocity(2.0); // moves continuously at 2 rotations per second
      myStepper.setVelocity(0.0); // stops the motor
      ```
@@ -139,7 +140,7 @@ The driver is designed to work with stepper motors that require direction and st
 4. **Steps Control (`setSteps`)**:
    - **Purpose**: Moves the motor to a specific step count at a given velocity. It handles the direction automatically.
    - **Usage**:
-     ```
+     ```cpp
      myStepper.setSteps(1600, 2.0); // moves to step 1600 at 2 rotations per second
      ```
 

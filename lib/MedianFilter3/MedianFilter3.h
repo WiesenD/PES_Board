@@ -1,3 +1,9 @@
+/**
+ * @file MedianFilter3.h
+ * @brief This file defines the MedianFilter3 class.
+ * @author M. Peter / pmic / pichim
+ */
+
 #ifndef MEDIAN_FILTER_3_H_
 #define MEDIAN_FILTER_3_H_
 
@@ -10,8 +16,8 @@ class MedianFilter3
 {
 public:
     // constructors
-    MedianFilter3();
-    ~MedianFilter3() = default;
+    explicit MedianFilter3();
+    virtual ~MedianFilter3() = default;
 
     // optionally call this if you want to re-init the filter later.
     void init();

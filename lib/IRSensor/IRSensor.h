@@ -1,3 +1,9 @@
+/**
+ * @file IRSensor.h
+ * @brief This file defines the IRSensor class.
+ * @author M. Peter / pmic / pichim
+ */
+
 #ifndef IR_SENSOR_H_
 #define IR_SENSOR_H_
 
@@ -14,7 +20,7 @@ class IRSensor
 public:
     explicit IRSensor(PinName pin);
     explicit IRSensor(PinName pin, float a, float b);
-    ~IRSensor();
+    virtual ~IRSensor();
 
     // resets the filter to the current readout
     float reset();

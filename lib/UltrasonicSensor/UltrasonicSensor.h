@@ -28,8 +28,7 @@
  * float distance = ultrasonicSensor;
  * ```
  *
- * @author M. E. Peter
- * @date 12.12.2023
+ * @author M. Peter / pmic / pichim
  */
 
 #ifndef ULTRASONIC_SENSOR_H_
@@ -58,7 +57,7 @@ public:
     /**
      * @brief Destroy the UltrasonicSensor object.
      */
-    ~UltrasonicSensor();
+    virtual ~UltrasonicSensor();
 
     /**
      * @brief Read the measured distance in centimeters.

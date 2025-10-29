@@ -1,14 +1,14 @@
 #include "DCMotor.h"
 
-DCMotor::DCMotor(PinName pin_pwm,
-                 PinName pin_enc_a,
-                 PinName pin_enc_b,
+DCMotor::DCMotor(PinName pwm_pin,
+                 PinName enc_a_pin,
+                 PinName enc_b_pin,
                  float gear_ratio,
                  float kn,
                  float voltage_max,
-                 float counts_per_turn) : m_FastPWM(pin_pwm),
-                                          m_EncoderCounter(pin_enc_a, pin_enc_b),
-                                          m_Thread(osPriorityHigh1, 4096)
+                 float counts_per_turn) : m_FastPWM(pwm_pin),
+                                          m_EncoderCounter(enc_a_pin, enc_b_pin),
+                                          m_Thread(osPriorityHigh1)
 #if PERFORM_CHIRP_MEAS
                                           , m_BufferedSerial(USBTX, USBRX)
 #endif
@@ -22,8 +22,8 @@ DCMotor::DCMotor(PinName pin_pwm,
     // default controller parameters, parameters adapted from gear ratio 78:1 tune
     const float k_gear = gear_ratio / 78.125f;
     setVelocityCntrl(DCMotor::KP * k_gear, DCMotor::KI * k_gear, DCMotor::KD * k_gear);
-    if (kn != 0.0f)
-        m_PIDCntrl_velocity.setCoeff_F(60.0f / kn);
+    if (kn > 0.0f)
+        m_PIDCntrl_velocity.setParamF(60.0f / kn);
     setRotationCntrlGain();
 
     // iir filter
@@ -160,6 +160,8 @@ void DCMotor::setVelocityCntrl(float kp, float ki, float kd)
                               m_voltage_max * (2.0f * PWM_MAX - 1.0f));
     // avoid students melting their motors
     setVelocityCntrlIntegratorLimitsPercent();
+    // // print for debugging
+    // printf("DCMotor: velocity controller parameters: kp = %.4f, ki = %.4f, kd = %.4f\n", kp, ki, kd);
 }
 
 void DCMotor::setVelocityCntrlIntegratorLimitsPercent(float percent_of_max)
@@ -222,6 +224,12 @@ void DCMotor::setMotionPlanerVelocity(float velocity) {
 
 void DCMotor::setMotionPlanerPosition(float position) {
     m_Motion.setPosition(position);
+}
+
+void DCMotor::setFastPWMPeriod_mus(int period_mus)
+{
+    // set the period of the PWM signal in microseconds
+    m_FastPWM.period_mus(period_mus);
 }
 
 #if PERFORM_GPA_MEAS

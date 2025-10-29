@@ -1,3 +1,9 @@
+/**
+ * @file Stepper.h
+ * @brief This file defines the Stepper class.
+ * @author M. Peter / pmic / pichim
+ */
+
 #ifndef STEPPER_H_
 #define STEPPER_H_
 
@@ -22,7 +28,7 @@ public:
     /**
      * @brief Destroys the Stepper object, cleaning up resources.
      */
-    ~Stepper();
+    virtual ~Stepper();
 
     /**
      * @brief Gets the current step setpoint.
